@@ -22,7 +22,13 @@ public class FileReader {
         }
     }
 
-    public String[] splitLine(String line) {
+    public String[] getUser(String line) {
         return line.replace(" follows", ",").split(", ");
+    }
+
+    public String getTweet(String data) {
+        String firstChar = data.charAt(0) + "";
+
+        return data.replace(firstChar, "\t@" + firstChar).replace("> ", ": ");
     }
 }
