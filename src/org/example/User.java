@@ -1,32 +1,25 @@
 package org.example;
 
-import java.util.List;
+import java.util.HashSet;
 
 public class User {
     private String name;
-    private List<User> followers;
+    private HashSet<String> follows;
 
-
-    public User() {
-    }
-
-    public void setName(String name) {
+    public User(String name) {
         this.name = name;
+        this.follows = new HashSet<>();
     }
 
     public String getName() {
         return name;
     }
 
-    public List<User> getFollowers() {
-        try {
-            return this.followers;
-        } catch (Exception e) {
-            throw new RuntimeException(this.name + " has no followers");
-        }
+    public HashSet<String> getFollows() {
+        return this.follows;
     }
 
-    public void setFollowers(List<User> followers) {
-        this.followers = followers;
+    public void setFollows(HashSet<String> followers) {
+        this.follows = followers;
     }
 }

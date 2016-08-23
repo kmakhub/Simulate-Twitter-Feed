@@ -1,29 +1,20 @@
 package org.example;
 
-import javafx.util.Pair;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Tweet {
 
-    private List<Pair<String, String>> tweetFeed;
+    private final String userName;
+    private final String message;
 
-    public List<String> getTweetFeed(String name) {
-        List<String> messages = new ArrayList<>();
-        messages.add(""); // TODO: 2016/08/20 --cater for users with not tweets
-
-        if (tweetFeed != null) {
-            for (Pair<String, String> tweet : tweetFeed) {
-                if (tweet.getKey().equals(name)) {
-                     messages.add("\t@" + tweet.getKey() + ": " + tweet.getValue());
-                }
-            }
-        }
-        return messages;
+    public Tweet(String userName, String message) {
+        this.userName = userName;
+        this.message = message;
     }
 
-    public void createUserFeed(List<Pair<String, String>> tweetFeed) {
-        this.tweetFeed = tweetFeed;
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getMessage() {
+        return message;
     }
 }

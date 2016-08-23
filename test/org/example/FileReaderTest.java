@@ -1,13 +1,10 @@
 package org.example;
 
-import javafx.util.Pair;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.IOException;
 import java.util.Scanner;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -15,30 +12,24 @@ import static org.junit.Assert.assertEquals;
 
 
 public class FileReaderTest {
-    private FileReader fileReader;
     private Scanner userInstance;
-    private Scanner tweetInstance;
 
     @Before
     public void setUp() {
-        fileReader = FileReader.getInstance();
-        userInstance = fileReader.readFile("sample data/user.txt");
-        tweetInstance = fileReader.readFile("sample data/tweet.txt");
+        userInstance = FileReader.readFile("sample data/user.txt");
     }
 
     @After
     public void tearDown() {
-        fileReader = null;
         userInstance = null;
-        tweetInstance = null;
     }
 
-    @Test(expected = RuntimeException.class)
-    public void shouldReadDataFromFileWhenItThrowsAnException() throws FileNotFoundException {
+    @Test(expected = ExceptionLogger.class)
+    public void shouldReadDataFromFileWhenItThrowsAnException() throws IOException {
 
         Scanner expectedData = new Scanner("some data");
 
-        assertEquals(expectedData.hasNext(), fileReader.readFile("filename.txt").hasNext());
+        assertEquals(expectedData.hasNext(), FileReader.readFile("filename.txt").hasNext());
     }
 
     @Test
@@ -58,59 +49,9 @@ public class FileReaderTest {
         String line2 = "Ward follows Alan, Martin";
         String line3 = "Ward follows Alan, Martin, Jacob, Adam";
 
-        assertArrayEquals(new String[]{"Ward", "Alan"}, fileReader.getUser(line));
-        assertArrayEquals(new String[]{"Ward", "Alan", "Martin"}, fileReader.getUser(line2));
-        assertArrayEquals(new String[]{"Ward", "Alan", "Martin", "Jacob", "Adam"}, fileReader.getUser(line3));
-    }
-
-    @Test
-    public void shouldCreateUserGivenAListOfUsers() throws Exception {
-
-        User user = new User();
-
-        user.setName("Ward");
-
-        assertEquals("Ward", user.getName());
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void shouldCreateUserWhoHasNoFollower() throws Exception {
-
-        User user = new User();
-        user.setName("Alan");
-
-        assertEquals("Ward", user.getFollowers().get(0).getName());
-    }
-
-    @Test
-    public void shouldCreateUserWhoHasOneFollower() throws Exception {
-
-        List<User> names = createFollower();
-
-        User user = new User();
-        user.setName("Alan");
-        user.setFollowers(names);
-
-        assertEquals("Alan", user.getName());
-
-        assertEquals("Ward", user.getFollowers().get(0).getName());
-    }
-
-    @Test
-    public void shouldCreateUserManyFollowers() throws Exception {
-
-        List<User> names = createFollower();
-        names.add(createUser("Martin"));
-        names.add(createUser("Bob"));
-
-        User user = createUser("Alan");
-        user.setFollowers(names);
-
-        assertEquals("Alan", user.getName());
-
-        assertEquals("Ward", user.getFollowers().get(0).getName());
-        assertEquals("Martin", user.getFollowers().get(1).getName());
-        assertEquals("Bob", user.getFollowers().get(2).getName());
+        assertArrayEquals(new String[]{"Ward", "Alan"}, FileReader.splitUser(line));
+        assertArrayEquals(new String[]{"Ward", "Alan", "Martin"}, FileReader.splitUser(line2));
+        assertArrayEquals(new String[]{"Ward", "Alan", "Martin", "Jacob", "Adam"}, FileReader.splitUser(line3));
     }
 
     @Test
@@ -118,97 +59,13 @@ public class FileReaderTest {
 
     }
 
-    // TODO: 2016/08/20 -- change this
     @Test
     public void shouldReplaceGivenTweetDataToRecommendedOutput() throws Exception {
 
         String line = "Alan> If you have a procedure with 10 parameters, you probably missed some.";
 
-        assertEquals("\t@Alan: If you have a procedure with 10 parameters, you probably missed some.", fileReader.getTweet(line));
-    }
-
-    @Test
-    public void shouldReturnEmptyStringIfGetTweetFeedForUserWithNoTweets() throws Exception {
-        Tweet tweet = new Tweet();
-
-        assertEquals("", tweet.getTweetFeed("someRandom").get(0));
-    }
-
-    @Test
-    public void shouldReturnTweetForUserWhoHasATweet() throws Exception {
-        Tweet tweet = new Tweet();
-
-        List<Pair<String, String>> tweetList = new ArrayList<>();
-
-        tweetList.add(new Pair<>("Alan", "If you have a procedure with 10 parameters, you probably missed some."));
-
-        tweet.createUserFeed(tweetList);
-
-        String expectedTweetFeed = "\t@Alan: If you have a procedure with 10 parameters, you probably missed some.";
-
-        assertEquals(expectedTweetFeed, tweet.getTweetFeed("Alan").get(1));
-
-    }
-
-    @Test
-    public void shouldReturnAllTweetsMadeByUser() throws Exception {
-        Tweet tweet = new Tweet();
-
-        List<Pair<String, String>> tweetList = new ArrayList<>();
-
-        tweetList.add(new Pair<>("Alan", "If you have a procedure with 10 parameters, you probably missed some."));
-        tweetList.add(new Pair<>("Alan", "Random numbers should not be generated with a method chosen at random."));
-
-        tweet.createUserFeed(tweetList);
-
-        String expectedTweetFeed = "\t@Alan: If you have a procedure with 10 parameters, you probably missed some.";
-        String expectedTweetFeed2 = "\t@Alan: Random numbers should not be generated with a method chosen at random.";
-
-        assertEquals(expectedTweetFeed, tweet.getTweetFeed("Alan").get(1));
-        assertEquals(expectedTweetFeed2, tweet.getTweetFeed("Alan").get(2));
-
-    }
-
-    @Test
-    public void shouldReturnAllTweetMadeByUserAndTheyFollowers() throws Exception {
-//        Tweet tweet = new Tweet();
-//
-//        List<Pair<String, String>> tweetList = new ArrayList<>();
-//
-//        tweetList.add(new Pair<>("Alan", "If you have a procedure with 10 parameters, you probably missed some."));
-//        tweetList.add(new Pair<>("Martin", "Random numbers should not be generated with a method chosen at random."));
-//
-//        tweet.createUserFeed(tweetList);
-//
-//        String expectedTweetFeed = "\t@Alan: If you have a procedure with 10 parameters, you probably missed some.";
-//        String expectedTweetFeed2 = "\t@Martin: If you have a procedure with 10 parameters, you probably missed some.";
-//
-//        assertEquals(expectedTweetFeed, tweet.getTweetFeed("Alan").get(1));
-//        assertEquals(expectedTweetFeed2, tweet.getTweetFeed("Martin").get(2));
-
-    }
-
-    @Test
-    public void shouldCreateAUserFeedGivenTheNameOfTheUserWithFollowers() throws Exception {
-        Tweet tweet = new Tweet();
-
-        String expectedTweet = "\t@Alan: If you have a procedure with 10 parameters, you probably missed some.";
-
-//        assertEquals(expectedTweet, tweet.createUserFeed("Alan", message));
-
-    }
-
-    private User createUser(String name) {
-        User user = new User();
-        user.setName(name);
-        return user;
-    }
-
-    private List<User> createFollower() {
-        List<User> names = new ArrayList<>();
-        User expectedFollower = createUser("Ward");
-        names.add(expectedFollower);
-        return names;
+        assertEquals("Alan", FileReader.splitTweet(line)[0]);
+        assertEquals("If you have a procedure with 10 parameters, you probably missed some.", FileReader.splitTweet(line)[1]);
     }
 
 }
